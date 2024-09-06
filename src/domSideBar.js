@@ -1,4 +1,6 @@
 const sideBar = document.querySelector('#sideBar');
+const container = document.querySelector('#container');
+
 
 export function generateSideBar () {
 
@@ -21,6 +23,10 @@ export function generateSideBar () {
   const addNewProjectBtn = document.createElement('button');
   addNewProjectBtn.textContent = 'create project';
   addNewProjectBtn.id = 'addNewProjectBtn';
+  addNewProjectBtn.addEventListener('click', () => {
+
+    createNewProjects(container);
+  })
   
 
   sideBar.appendChild(allProjectDiv);
@@ -29,4 +35,35 @@ export function generateSideBar () {
   sideBar.appendChild(sectionOff);
   sideBar.appendChild(addNewProjectBtn);
 
+}
+
+// dom code for create the new project dialog.
+
+
+function createNewProjects(container) {
+
+  const projectDialog = document.createElement('div');
+  projectDialog.id = 'projectDialog';
+
+  const projectDialogTitle = document.createElement('p');
+  projectDialogTitle.id = 'projectDialogTitle';
+  projectDialogTitle.textContent = ' create new project';
+
+  const projectDialogName = document.createElement('input');
+  projectDialogName.id = 'projectDialogName';
+  projectDialogName.placeholder = 'Project Name';
+
+  const projectDialogCreateBtn = document.createElement('button');
+  projectDialogCreateBtn.classList.add('projectDialogBtn');
+  projectDialogCreateBtn.textContent = 'create';
+
+  const projectDialogCancelBtn = document.createElement('button');
+  projectDialogCancelBtn.classList.add('projectDialogBtn');
+  projectDialogCancelBtn.textContent = 'cancel';
+
+  container.appendChild(projectDialog);
+  projectDialog.appendChild(projectDialogTitle);
+  projectDialog.appendChild(projectDialogName);
+  projectDialog.appendChild(projectDialogCreateBtn);
+  projectDialog.appendChild(projectDialogCancelBtn);
 }
