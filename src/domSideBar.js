@@ -1,3 +1,6 @@
+import { createNewProject, deleteProject ,} from "./projectManager";
+import { destroyDialogBox } from "./projects";
+
 const sideBar = document.querySelector('#sideBar');
 const container = document.querySelector('#container');
 
@@ -56,10 +59,21 @@ function createNewProjects(container) {
   const projectDialogCreateBtn = document.createElement('button');
   projectDialogCreateBtn.classList.add('projectDialogBtn');
   projectDialogCreateBtn.textContent = 'create';
+  projectDialogCreateBtn.addEventListener('click', () => {
+
+    let newProjectName = projectDialogName.value;
+    createNewProject(newProjectName);
+    destroyDialogBox(container,projectDialog);
+
+  })
 
   const projectDialogCancelBtn = document.createElement('button');
   projectDialogCancelBtn.classList.add('projectDialogBtn');
   projectDialogCancelBtn.textContent = 'cancel';
+  projectDialogCancelBtn.addEventListener('click', () => {
+
+    destroyDialogBox(container);
+  })
 
   container.appendChild(projectDialog);
   projectDialog.appendChild(projectDialogTitle);
