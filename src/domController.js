@@ -1,3 +1,6 @@
+import { makeNewProjectObj, makeNewTodoObj } from "./todo";
+
+
 const container = document.getElementById('container');
 const sideBar = document.getElementById('sideBar');
 const mainArea = document.getElementById('mainArea');
@@ -65,7 +68,8 @@ function createProjectDialog() {
 
     let name = projectDialogInput.value;
     makeNewProject(name);
-    clearDialog();
+    makeNewProjectObj(name);
+    clearProjectDialog();
   });
   
   const projectDialogCancel = document.createElement('button');
@@ -134,7 +138,6 @@ function mainAreaCreation () {
   addTodoBtn.addEventListener('click', () => {
 
     createTodoDialog();
-    clearTodoDialog();
   });
   
   const allTodoDisplay = document.createElement('div');
@@ -149,10 +152,12 @@ function mainAreaCreation () {
 // todo dialog box creation code.
 function createTodoDialog() {
 
-  const todoForm =  document.createElement('form');
+  const todoForm =  document.createElement('div');
+  todoForm.id = 'todoForm';
 
   const todoHeading = document.createElement('p');
   todoHeading.textContent = 'create new todo';
+  todoHeading.id = 'todoHeading';
 
   const inputLabel = document.createElement('label');
   inputLabel.textContent = 'Name:';
@@ -166,6 +171,7 @@ function createTodoDialog() {
   const todoInputDescription = document.createElement('textarea');
   todoInputDescription.name = 'description';
   todoInputDescription.placeholder = 'todo description';
+  todoInputDescription.id = 'todoInputDescription';
   
   const dateLabel =  document.createElement('label');
   dateLabel.textContent = 'due Date';
@@ -185,16 +191,32 @@ function createTodoDialog() {
   });
   todoPriority.name = 'priority level';
 
-  const confirmLabel = document.createElement('label');
-  confirmLabel.textContent = 'confirm';
   const todoConfirm =  document.createElement('button');
   todoConfirm.type = 'submit';
   todoConfirm.name = 'confirm';
+  todoConfirm.id = 'todoConfirmBtn';
+  todoConfirm.textContent = 'confirm';
+  todoConfirm.addEventListener('click', () => {
 
-  const cancelLabel = document.createElement('label');
+    let todoName = todoInputName.value;
+    let description = todoInputDescription.value;
+    let priority = todoPriority.value;
+    let dueDate = todoDueDate.value;
+
+    makeNewTodoObj(todoName,description,dueDate,priority);
+    linkProjectWithTodo();
+    clearTodoDialog();
+  });
+
   const todoCancel = document.createElement('button');
   todoCancel.type = 'reset';
   todoCancel.name = 'cancel';
+  todoCancel.id = 'todoCancelBtn';
+  todoCancel.textContent = 'cancel';
+  todoCancel.addEventListener('click', () => {
+
+    clearTodoDialog();
+  });
 
   todoForm.appendChild(todoHeading);
   todoForm.appendChild(inputLabel);
@@ -205,12 +227,14 @@ function createTodoDialog() {
   todoForm.appendChild(todoDueDate);
   todoForm.appendChild(priorityLable);
   todoForm.appendChild(todoPriority);
-  todoForm.appendChild(confirmLabel);
   todoForm.appendChild(todoConfirm);
-  todoForm.appendChild(cancelLabel);
   todoForm.appendChild(todoCancel);
 
   container.appendChild(todoForm);
 
 } 
 
+function clearTodoDialog() {
+
+  container.removeChild(todoForm);
+}
