@@ -1,19 +1,21 @@
-import { createNewProjectObj,createNewTodoObj } from "./todo";
+import { createNewProjectObj, createNewTodoObj } from "./todo";
+import { projects, currentProject } from "./projectManager";
 
 const container = document.getElementById('container');
 const sideBar = document.getElementById('sideBar');
 const mainArea = document.getElementById('mainArea');
 
-// function to generate the page.
+// Function to generate the page.
 export function domCreation() {
-  
+  console.log('Calling domCreation()');
   sideBarCreation();
   mainAreaCreation();
 }
 
-// the sideBar DOM creation code.
-function sideBarCreation () {
-
+// The sidebar DOM creation code.
+function sideBarCreation() {
+  console.log('Generating sidebar');
+  
   const allProjectsDiv = document.createElement('div');
   allProjectsDiv.id = 'allProjectsDiv';
   allProjectsDiv.textContent = 'all projects';
@@ -34,7 +36,6 @@ function sideBarCreation () {
   createProjectsBtn.id = 'createProjectBtn';
   createProjectsBtn.textContent = 'new project';
   createProjectsBtn.addEventListener('click', () => {
-
     createProjectDialog();
   });
 
@@ -43,11 +44,91 @@ function sideBarCreation () {
   sideBar.appendChild(todayDiv);
   sideBar.appendChild(projectsDiv);
   sideBar.appendChild(createProjectsBtn);
+
+  // Rebuild sidebar with existing projects after the page refresh
+  projects.forEach(project => makeNewProject(project));
 }
 
-// project creation dialog code.
-function createProjectDialog() {
+// Function to create a new project tab/div on the sidebar
+function makeNewProject(project) {
+  const newProjectDiv = document.createElement('div');
+  newProjectDiv.classList.add('newProjectDiv'); // Class for multiple projects
+  
+  const newProjectDivName = document.createElement('p');
+  newProjectDivName.textContent = project.name;
 
+  const newProjectDivDelete = document.createElement('button');
+  newProjectDivDelete.textContent = 'delete';
+  newProjectDivDelete.addEventListener('click', () => {
+    deleteProject(project.name); // Delete project by name
+  });
+
+  // When the user clicks on the project, set it as the current project
+  newProjectDiv.addEventListener('click', () => {
+    currentProject = project; // Set the selected project as current
+    document.getElementById('currentProject').textContent = `Project: ${project.name}`; // Update main area
+  });
+
+  newProjectDiv.appendChild(newProjectDivName);
+  newProjectDiv.appendChild(newProjectDivDelete);
+  sideBar.appendChild(newProjectDiv);
+}
+
+// Function to delete project and remove from DOM
+function deleteProject(projectName) {
+  // Remove from projects array
+  const projectIndex = projects.findIndex(project => project.name === projectName);
+  if (projectIndex !== -1) {
+    projects.splice(projectIndex, 1);
+
+    // Remove from sidebar
+    const projectDiv = Array.from(document.getElementsByClassName('newProjectDiv')).find(div => 
+      div.querySelector('p').textContent === projectName
+    );
+    if (projectDiv) {
+      sideBar.removeChild(projectDiv);
+    }
+
+    // Reset currentProject if deleted
+    if (currentProject && currentProject.name === projectName) {
+      currentProject = null;
+      document.getElementById('currentProject').textContent = 'No project selected';
+    }
+
+    console.log('Project deleted:', projectName);
+    saveToLocalStorage(); // Save changes to localStorage
+  }
+}
+
+// Main area DOM creation code.
+function mainAreaCreation() {
+  console.log('Generating main area');
+  
+  const headerDiv = document.createElement('div');
+  headerDiv.id = 'headerDiv';
+
+  const currentProjectDiv = document.createElement('div');
+  currentProjectDiv.id = 'currentProject';
+  currentProjectDiv.textContent = 'current project';
+
+  const addTodoBtn = document.createElement('button');
+  addTodoBtn.id = 'addTodoBtn';
+  addTodoBtn.textContent = 'add Todo';
+  addTodoBtn.addEventListener('click', () => {
+    createTodoDialog();
+  });
+
+  const allTodoDisplay = document.createElement('div');
+  allTodoDisplay.id = 'allTodoDisplay';
+
+  headerDiv.appendChild(currentProjectDiv);
+  headerDiv.appendChild(addTodoBtn);
+  mainArea.appendChild(headerDiv);
+  mainArea.appendChild(allTodoDisplay);
+}
+
+// Project dialog box creation code.
+function createProjectDialog() {
   const projectDialogBox = document.createElement('div');
   projectDialogBox.id = 'projectDialogBox';
 
@@ -59,23 +140,22 @@ function createProjectDialog() {
   projectDialogInput.id = 'projectDialogInput';
   projectDialogInput.placeholder = 'project name';
 
-
   const projectDialogSubmit = document.createElement('button');
   projectDialogSubmit.classList.add('projectBtns');
   projectDialogSubmit.textContent = 'submit';
   projectDialogSubmit.addEventListener('click', () => {
-
     let name = projectDialogInput.value;
-    makeNewProject(name);
-    let newlyCreatedProject = createNewProjectObj(name);
-    clearProjectDialog();
+    if (name) {
+      const newProject = createNewProjectObj(name); // Create new project object
+      makeNewProject(newProject); // Create new project in the DOM
+      clearProjectDialog();
+    }
   });
-  
+
   const projectDialogCancel = document.createElement('button');
   projectDialogCancel.classList.add('projectBtns');
   projectDialogCancel.textContent = 'cancel';
   projectDialogCancel.addEventListener('click', () => {
-
     clearProjectDialog();
   });
 
@@ -86,77 +166,17 @@ function createProjectDialog() {
   container.appendChild(projectDialogBox);
 }
 
-// to remove project dialog box.
+// Function to clear the project dialog box
 function clearProjectDialog() {
-
-  container.removeChild(projectDialogBox);
+  const projectDialogBox = document.getElementById('projectDialogBox');
+  if (projectDialogBox) {
+    container.removeChild(projectDialogBox);
+  }
 }
 
-// to create a new project tab/div on the sidebar.
-function makeNewProject(name) {
-  const newProjectDiv = document.createElement('div');
-  newProjectDiv.id = 'newProjectDiv'; // Adding class for multiple projects
-
-  const newProjectDivName = document.createElement('p');
-  newProjectDivName.textContent = name;
-
-  const newProjectDivDelete = document.createElement('button');
-  newProjectDivDelete.textContent = 'delete';
-  newProjectDivDelete.addEventListener('click', () => {
-    clearProjectSideBar();
-  });
-
-  // When the user clicks on the project, set it as the current project
-  newProjectDiv.addEventListener('click', () => {
-    const selectedProject = projects.find(project => project.name === name);
-    currentProject = selectedProject; // Set the selected project as current
-    document.getElementById('currentProject').textContent = `Project: ${name}`; // Update main area
-  });
-
-  newProjectDiv.appendChild(newProjectDivName);
-  newProjectDiv.appendChild(newProjectDivDelete);
-  sideBar.appendChild(newProjectDiv);
-}
-
-
-// to remove the already  created projects.
-function clearProjectSideBar() {
-
-  sideBar.removeChild(newProjectDiv);
-}
-
-// mainArea DOM creation code.
-function mainAreaCreation () {
-
-  const headerDiv = document.createElement('div');
-  headerDiv.id = 'headerDiv';
-
-  const currentProject = document.createElement('div');
-  currentProject.id = 'currentProject';
-  currentProject.textContent = 'current project';
-
-  const addTodoBtn = document.createElement('button');
-  addTodoBtn.id = 'addTodoBtn';
-  addTodoBtn.textContent = 'add Todo';
-  addTodoBtn.addEventListener('click', () => {
-
-    createTodoDialog();
-  });
-  
-  const allTodoDisplay = document.createElement('div');
-  allTodoDisplay.id = 'allTodoDisplay';
-
-  headerDiv.appendChild(currentProject);
-  headerDiv.appendChild(addTodoBtn);
-  mainArea.appendChild(headerDiv);
-  mainArea.appendChild(allTodoDisplay);
-}
-
-let todoForm;
-// todo dialog box creation code.
+// Todo dialog box creation code.
 function createTodoDialog() {
-
-  todoForm =  document.createElement('div');
+  const todoForm = document.createElement('div');
   todoForm.id = 'todoForm';
 
   const todoHeading = document.createElement('p');
@@ -170,94 +190,76 @@ function createTodoDialog() {
   todoInputName.type = 'text';
   todoInputName.name = 'name';
 
-  const DescriptionLabel = document.createElement('label');
-  DescriptionLabel.textContent = 'description:';
+  const descriptionLabel = document.createElement('label');
+  descriptionLabel.textContent = 'description:';
   const todoInputDescription = document.createElement('textarea');
   todoInputDescription.name = 'description';
   todoInputDescription.placeholder = 'todo description';
   todoInputDescription.id = 'todoInputDescription';
   
-  const dateLabel =  document.createElement('label');
+  const dateLabel = document.createElement('label');
   dateLabel.textContent = 'due Date';
   const todoDueDate = document.createElement('input');
   todoDueDate.type = 'date';
   todoDueDate.name = 'due Date';
 
-  const priorityLable = document.createElement('label');
-  priorityLable.textContent = 'priority level';
+  const priorityLabel = document.createElement('label');
+  priorityLabel.textContent = 'priority level';
   const todoPriority = document.createElement('select');
-  let options = ['low','medium','high'];
+  const options = ['low', 'medium', 'high'];
   options.forEach(optionText => {
-    let option = document.createElement('option');
+    const option = document.createElement('option');
     option.value = optionText.toLowerCase();
     option.textContent = optionText;
     todoPriority.appendChild(option);
   });
   todoPriority.name = 'priority level';
 
-  const todoConfirm =  document.createElement('button');
+  const todoConfirm = document.createElement('button');
   todoConfirm.type = 'submit';
   todoConfirm.name = 'confirm';
   todoConfirm.id = 'todoConfirmBtn';
   todoConfirm.textContent = 'confirm';
   todoConfirm.addEventListener('click', () => {
-    let todoName = todoInputName.value;
-    let description = todoInputDescription.value;
-    let priority = todoPriority.value;
-    let dueDate = todoDueDate.value;
-  
+    const todoName = todoInputName.value;
+    const description = todoInputDescription.value;
+    const priority = todoPriority.value;
+    const dueDate = todoDueDate.value;
+
     // Use currentProject for adding the new todo
     createNewTodoObj(todoName, description, dueDate, priority);
-  
-    clearTodoDialog(todoForm);
+
+    clearTodoDialog();
   });
-  
+
   const todoCancel = document.createElement('button');
   todoCancel.type = 'reset';
   todoCancel.name = 'cancel';
   todoCancel.id = 'todoCancelBtn';
   todoCancel.textContent = 'cancel';
   todoCancel.addEventListener('click', () => {
-
-    clearTodoDialog(todoForm);
+    clearTodoDialog();
   });
 
   todoForm.appendChild(todoHeading);
   todoForm.appendChild(inputLabel);
   todoForm.appendChild(todoInputName);
-  todoForm.appendChild(DescriptionLabel);
+  todoForm.appendChild(descriptionLabel);
   todoForm.appendChild(todoInputDescription);
   todoForm.appendChild(dateLabel);
   todoForm.appendChild(todoDueDate);
-  todoForm.appendChild(priorityLable);
+  todoForm.appendChild(priorityLabel);
   todoForm.appendChild(todoPriority);
   todoForm.appendChild(todoConfirm);
   todoForm.appendChild(todoCancel);
 
   container.appendChild(todoForm);
-
-} 
-
-function clearTodoDialog(todoForm) {
-
-  container.removeChild(todoForm);
 }
 
-// to display newly made todos in the mainArea.
-
-function displayNewTodo (makeNewTodoObj) {
-
-  const displayTodoDiv = document.createElement('div');
-
-  const displayTodoName = document.createElement('p');
-
-  const displayTodoDescription = document.createElement('p');
-
-  const displayTodoDueDate = document.createElement('p');
-
-  const displayTodoPriority = document.createElement('p');
-
-  const displayTodoDelete = document.createElement('button');
-
-  const displayTodoCompeleted = document.createElement('div')
+// Function to clear the todo dialog box
+function clearTodoDialog() {
+  const todoForm = document.getElementById('todoForm');
+  if (todoForm) {
+    container.removeChild(todoForm);
+  }
 }
