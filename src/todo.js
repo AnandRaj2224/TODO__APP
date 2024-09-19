@@ -35,12 +35,21 @@ export function makeNewProjectObj(name) {
 }
 
 // to make new todo object.
-export function makeNewTodoObj(todoName,description,dueDate,priority) {
-
-  const todo1 = new Todo(todoName,description,dueDate,priority);
+export function makeNewTodoObj(todoName, description, dueDate, priority) {
+  const todo1 = new Todo(todoName, description, dueDate, priority);
   console.log(todo1);
+  return todo1; // Return the new todo object
 }
 
-export function linkProjectWithTodo() {
+let currentProject = null; // Global variable to track the current selected project
 
+// to link the todo to the current project
+export function linkProjectWithTodo(todoObj) {
+  if (currentProject) {
+    currentProject.addTodos(todoObj); // Add todo to the current project
+    console.log(`Todo added to project: ${currentProject.name}`);
+    console.log(currentProject.todo); // Display todos of current project
+  } else {
+    console.log("No project selected.");
+  }
 }
