@@ -1,5 +1,4 @@
-import { makeNewProjectObj, makeNewTodoObj } from "./todo";
-
+import { createNewProjectObj,createNewTodoObj } from "./todo";
 
 const container = document.getElementById('container');
 const sideBar = document.getElementById('sideBar');
@@ -21,7 +20,7 @@ function sideBarCreation () {
 
   const thisWeekDiv = document.createElement('div');
   thisWeekDiv.id = 'thisWeekDiv';
-  thisWeekDiv.textContent = 'this week';
+  thisWeekDiv.textContent = 'all todos';
 
   const todayDiv = document.createElement('div');
   todayDiv.id = 'todayDiv';
@@ -68,7 +67,7 @@ function createProjectDialog() {
 
     let name = projectDialogInput.value;
     makeNewProject(name);
-    makeNewProjectObj(name);
+    let newlyCreatedProject = createNewProjectObj(name);
     clearProjectDialog();
   });
   
@@ -95,48 +94,30 @@ function clearProjectDialog() {
 
 // to create a new project tab/div on the sidebar.
 function makeNewProject(name) {
-
   const newProjectDiv = document.createElement('div');
-  newProjectDiv.id = 'newProjectDiv';
+  newProjectDiv.id = 'newProjectDiv'; // Adding class for multiple projects
 
   const newProjectDivName = document.createElement('p');
-  newProjectDivName.id = 'newProjectDivName';
   newProjectDivName.textContent = name;
 
   const newProjectDivDelete = document.createElement('button');
-  newProjectDivDelete.id = 'newProjectDeleteBtn';
   newProjectDivDelete.textContent = 'delete';
   newProjectDivDelete.addEventListener('click', () => {
-
     clearProjectSideBar();
   });
 
-
-    // Add event listener to set the current project when selected
-    newProjectDiv.addEventListener('click', () => {
-      currentProject = projects.find(p => p.name === name); // Find the project by name
-      displayTodos(currentProject); // Display the project's todos
-      console.log(`Current project set to: ${currentProject.name}`);
-    });
-
+  // When the user clicks on the project, set it as the current project
+  newProjectDiv.addEventListener('click', () => {
+    const selectedProject = projects.find(project => project.name === name);
+    currentProject = selectedProject; // Set the selected project as current
+    document.getElementById('currentProject').textContent = `Project: ${name}`; // Update main area
+  });
 
   newProjectDiv.appendChild(newProjectDivName);
   newProjectDiv.appendChild(newProjectDivDelete);
   sideBar.appendChild(newProjectDiv);
 }
 
-
-function displayTodos(project) {
-  const allTodoDisplay = document.getElementById('allTodoDisplay');
-  allTodoDisplay.innerHTML = ''; // Clear previous todos
-
-  project.todo.forEach(todo => {
-    const todoDiv = document.createElement('div');
-    todoDiv.classList.add('todo-item');
-    todoDiv.textContent = `${todo.todoName} - ${todo.priority} - ${todo.dueDate}`;
-    allTodoDisplay.appendChild(todoDiv);
-  });
-}
 
 // to remove the already  created projects.
 function clearProjectSideBar() {
@@ -175,7 +156,7 @@ let todoForm;
 // todo dialog box creation code.
 function createTodoDialog() {
 
-   todoForm =  document.createElement('div');
+  todoForm =  document.createElement('div');
   todoForm.id = 'todoForm';
 
   const todoHeading = document.createElement('p');
@@ -220,17 +201,17 @@ function createTodoDialog() {
   todoConfirm.id = 'todoConfirmBtn';
   todoConfirm.textContent = 'confirm';
   todoConfirm.addEventListener('click', () => {
-
     let todoName = todoInputName.value;
     let description = todoInputDescription.value;
     let priority = todoPriority.value;
     let dueDate = todoDueDate.value;
-
-    makeNewTodoObj(todoName,description,dueDate,priority);
-    
+  
+    // Use currentProject for adding the new todo
+    createNewTodoObj(todoName, description, dueDate, priority);
+  
     clearTodoDialog(todoForm);
   });
-
+  
   const todoCancel = document.createElement('button');
   todoCancel.type = 'reset';
   todoCancel.name = 'cancel';
@@ -260,4 +241,23 @@ function createTodoDialog() {
 function clearTodoDialog(todoForm) {
 
   container.removeChild(todoForm);
+}
+
+// to display newly made todos in the mainArea.
+
+function displayNewTodo (makeNewTodoObj) {
+
+  const displayTodoDiv = document.createElement('div');
+
+  const displayTodoName = document.createElement('p');
+
+  const displayTodoDescription = document.createElement('p');
+
+  const displayTodoDueDate = document.createElement('p');
+
+  const displayTodoPriority = document.createElement('p');
+
+  const displayTodoDelete = document.createElement('button');
+
+  const displayTodoCompeleted = document.createElement('div')
 }

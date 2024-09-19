@@ -1,4 +1,6 @@
-const projects = [];
+let currentProject; // points to currently opened project
+let projects = []; // stores all the projects
+
 
 class Project {
 
@@ -7,49 +9,41 @@ class Project {
     this.todo = [];
   }
 
-  addTodos(todo) {
+  addTodo(todo) {
     this.todo.push(todo);
-  }
-
-  addprojects(project) {
-    projects.push(project);
   }
 
 }
 
 class Todo {
 
-  constructor(todoName,discription,dueDate,priority) {
+  constructor(todoName,description,dueDate,priority) {
     this.todoName = todoName;
-    this.discription = discription;
+    this.description = description;
     this.dueDate = dueDate;
     this.priority = priority;
   }
+
 }
 
-// to make a new project object.
-export function makeNewProjectObj(name) {
+export function createNewProjectObj(name) {
 
-  const Project1 = new Project(name);
-  console.log(Project1);
+  let project1 = new Project(name);
+
+  currentProject = project1;
+  projects.push(project1);
+
+  return project1;
 }
 
-// to make new todo object.
-export function makeNewTodoObj(todoName, description, dueDate, priority) {
-  const todo1 = new Todo(todoName, description, dueDate, priority);
-  console.log(todo1);
-  return todo1; // Return the new todo object
-}
+export function createNewTodoObj(todoName, description, dueDate, priority) {
+  let todo1 = new Todo(todoName, description, dueDate, priority);
 
-let currentProject = null; // Global variable to track the current selected project
-
-// to link the todo to the current project
-export function linkProjectWithTodo(todoObj) {
   if (currentProject) {
-    currentProject.addTodos(todoObj); // Add todo to the current project
-    console.log(`Todo added to project: ${currentProject.name}`);
-    console.log(currentProject.todo); // Display todos of current project
+    currentProject.addTodo(todo1); // Add todo to the current active project
+    console.log(currentProject);   // Logging the current project with its todos
+    console.log(projects);         // Logging all the projects
   } else {
-    console.log("No project selected.");
+    console.error("No project selected to add a todo to!");
   }
 }
