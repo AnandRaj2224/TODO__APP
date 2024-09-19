@@ -111,9 +111,31 @@ function makeNewProject(name) {
     clearProjectSideBar();
   });
 
+
+    // Add event listener to set the current project when selected
+    newProjectDiv.addEventListener('click', () => {
+      currentProject = projects.find(p => p.name === name); // Find the project by name
+      displayTodos(currentProject); // Display the project's todos
+      console.log(`Current project set to: ${currentProject.name}`);
+    });
+
+
   newProjectDiv.appendChild(newProjectDivName);
   newProjectDiv.appendChild(newProjectDivDelete);
   sideBar.appendChild(newProjectDiv);
+}
+
+
+function displayTodos(project) {
+  const allTodoDisplay = document.getElementById('allTodoDisplay');
+  allTodoDisplay.innerHTML = ''; // Clear previous todos
+
+  project.todo.forEach(todo => {
+    const todoDiv = document.createElement('div');
+    todoDiv.classList.add('todo-item');
+    todoDiv.textContent = `${todo.todoName} - ${todo.priority} - ${todo.dueDate}`;
+    allTodoDisplay.appendChild(todoDiv);
+  });
 }
 
 // to remove the already  created projects.
@@ -149,10 +171,11 @@ function mainAreaCreation () {
   mainArea.appendChild(allTodoDisplay);
 }
 
+let todoForm;
 // todo dialog box creation code.
 function createTodoDialog() {
 
-  const todoForm =  document.createElement('div');
+   todoForm =  document.createElement('div');
   todoForm.id = 'todoForm';
 
   const todoHeading = document.createElement('p');
@@ -204,8 +227,8 @@ function createTodoDialog() {
     let dueDate = todoDueDate.value;
 
     makeNewTodoObj(todoName,description,dueDate,priority);
-    linkProjectWithTodo();
-    clearTodoDialog();
+    
+    clearTodoDialog(todoForm);
   });
 
   const todoCancel = document.createElement('button');
@@ -215,7 +238,7 @@ function createTodoDialog() {
   todoCancel.textContent = 'cancel';
   todoCancel.addEventListener('click', () => {
 
-    clearTodoDialog();
+    clearTodoDialog(todoForm);
   });
 
   todoForm.appendChild(todoHeading);
@@ -234,7 +257,7 @@ function createTodoDialog() {
 
 } 
 
-function clearTodoDialog() {
+function clearTodoDialog(todoForm) {
 
   container.removeChild(todoForm);
 }
